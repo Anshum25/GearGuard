@@ -1,0 +1,251 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* GearGuard Design System - Odoo Enterprise + Modern SaaS */
+
+@layer base {
+  :root {
+    /* Core backgrounds */
+    --background: 0 0% 100%;
+    --foreground: 234 20% 15%;
+
+    /* Cards & surfaces */
+    --card: 0 0% 100%;
+    --card-foreground: 234 20% 15%;
+
+    --popover: 0 0% 100%;
+    --popover-foreground: 234 20% 15%;
+
+    /* Primary: Deep Indigo / Odoo Purple */
+    --primary: 243 75% 52%;
+    --primary-foreground: 0 0% 100%;
+
+    /* Secondary: Light indigo tint */
+    --secondary: 243 60% 96%;
+    --secondary-foreground: 243 75% 52%;
+
+    /* Muted: Soft gray */
+    --muted: 220 20% 96%;
+    --muted-foreground: 220 10% 45%;
+
+    /* Accent: Soft Blue */
+    --accent: 210 100% 52%;
+    --accent-foreground: 0 0% 100%;
+
+    /* Success: Green */
+    --success: 142 72% 42%;
+    --success-foreground: 0 0% 100%;
+
+    /* Destructive/Warning: Red */
+    --destructive: 0 84% 60%;
+    --destructive-foreground: 0 0% 100%;
+
+    /* Warning: Orange */
+    --warning: 38 92% 50%;
+    --warning-foreground: 0 0% 100%;
+
+    /* UI elements */
+    --border: 220 20% 90%;
+    --input: 220 20% 90%;
+    --ring: 243 75% 52%;
+
+    --radius: 0.75rem;
+
+    /* Gradients */
+    --gradient-primary: linear-gradient(135deg, hsl(243 75% 52%) 0%, hsl(210 100% 52%) 100%);
+    --gradient-hero: linear-gradient(180deg, hsl(243 60% 98%) 0%, hsl(0 0% 100%) 100%);
+    --gradient-cta: linear-gradient(135deg, hsl(243 75% 48%) 0%, hsl(210 100% 48%) 100%);
+
+    /* Shadows */
+    --shadow-sm: 0 1px 2px 0 hsl(234 20% 15% / 0.05);
+    --shadow-md: 0 4px 6px -1px hsl(234 20% 15% / 0.1), 0 2px 4px -2px hsl(234 20% 15% / 0.1);
+    --shadow-lg: 0 10px 15px -3px hsl(234 20% 15% / 0.1), 0 4px 6px -4px hsl(234 20% 15% / 0.1);
+    --shadow-xl: 0 20px 25px -5px hsl(234 20% 15% / 0.1), 0 8px 10px -6px hsl(234 20% 15% / 0.1);
+    --shadow-glow: 0 0 40px hsl(243 75% 52% / 0.15);
+
+    /* Sidebar (keeping for compatibility) */
+    --sidebar-background: 0 0% 98%;
+    --sidebar-foreground: 240 5.3% 26.1%;
+    --sidebar-primary: 243 75% 52%;
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: 243 60% 96%;
+    --sidebar-accent-foreground: 243 75% 52%;
+    --sidebar-border: 220 20% 90%;
+    --sidebar-ring: 243 75% 52%;
+  }
+
+  .dark {
+    --background: 234 25% 9%;
+    --foreground: 0 0% 95%;
+
+    --card: 234 25% 12%;
+    --card-foreground: 0 0% 95%;
+
+    --popover: 234 25% 12%;
+    --popover-foreground: 0 0% 95%;
+
+    --primary: 243 75% 60%;
+    --primary-foreground: 0 0% 100%;
+
+    --secondary: 234 25% 18%;
+    --secondary-foreground: 243 75% 70%;
+
+    --muted: 234 25% 18%;
+    --muted-foreground: 220 15% 60%;
+
+    --accent: 210 100% 60%;
+    --accent-foreground: 0 0% 100%;
+
+    --success: 142 72% 50%;
+    --success-foreground: 0 0% 100%;
+
+    --destructive: 0 72% 55%;
+    --destructive-foreground: 0 0% 100%;
+
+    --warning: 38 92% 55%;
+    --warning-foreground: 0 0% 100%;
+
+    --border: 234 25% 20%;
+    --input: 234 25% 20%;
+    --ring: 243 75% 60%;
+
+    --gradient-primary: linear-gradient(135deg, hsl(243 75% 60%) 0%, hsl(210 100% 60%) 100%);
+    --gradient-hero: linear-gradient(180deg, hsl(234 25% 9%) 0%, hsl(234 25% 12%) 100%);
+    --gradient-cta: linear-gradient(135deg, hsl(243 75% 55%) 0%, hsl(210 100% 55%) 100%);
+
+    --shadow-glow: 0 0 40px hsl(243 75% 60% / 0.2);
+
+    --sidebar-background: 234 25% 10%;
+    --sidebar-foreground: 0 0% 95%;
+    --sidebar-primary: 243 75% 60%;
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: 234 25% 18%;
+    --sidebar-accent-foreground: 243 75% 70%;
+    --sidebar-border: 234 25% 20%;
+    --sidebar-ring: 243 75% 60%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply bg-background text-foreground antialiased;
+    font-family: 'Inter', system-ui, sans-serif;
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    font-family: 'Poppins', 'Inter', system-ui, sans-serif;
+  }
+}
+
+@layer utilities {
+  .font-heading {
+    font-family: 'Poppins', 'Inter', system-ui, sans-serif;
+  }
+
+  .font-body {
+    font-family: 'Inter', system-ui, sans-serif;
+  }
+
+  .gradient-primary {
+    background: var(--gradient-primary);
+  }
+
+  .gradient-hero {
+    background: var(--gradient-hero);
+  }
+
+  .gradient-cta {
+    background: var(--gradient-cta);
+  }
+
+  .gradient-text {
+    background: var(--gradient-primary);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  .shadow-glow {
+    box-shadow: var(--shadow-glow);
+  }
+
+  /* Smooth scroll */
+  html {
+    scroll-behavior: smooth;
+  }
+
+  /* Custom scrollbar */
+  ::-webkit-scrollbar {
+    width: 8px;
+  }
+
+  ::-webkit-scrollbar-track {
+    @apply bg-muted;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    @apply bg-muted-foreground/30 rounded-full;
+  }
+
+  ::-webkit-scrollbar-thumb:hover {
+    @apply bg-muted-foreground/50;
+  }
+}
+
+/* Gear rotation animation */
+@keyframes gear-rotate {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes gear-rotate-reverse {
+  from {
+    transform: rotate(360deg);
+  }
+  to {
+    transform: rotate(0deg);
+  }
+}
+
+@keyframes pulse-glow {
+  0%, 100% {
+    box-shadow: 0 0 20px hsl(243 75% 52% / 0.4);
+  }
+  50% {
+    box-shadow: 0 0 40px hsl(243 75% 52% / 0.6);
+  }
+}
+
+@keyframes float {
+  0%, 100% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(-10px);
+  }
+}
+
+.animate-gear-rotate {
+  animation: gear-rotate 8s linear infinite;
+}
+
+.animate-gear-rotate-reverse {
+  animation: gear-rotate-reverse 6s linear infinite;
+}
+
+.animate-pulse-glow {
+  animation: pulse-glow 2s ease-in-out infinite;
+}
+
+.animate-float {
+  animation: float 3s ease-in-out infinite;
+}

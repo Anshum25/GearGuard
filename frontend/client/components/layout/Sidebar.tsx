@@ -8,41 +8,59 @@ import {
   ChevronRight,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { useAuth } from "@/contexts/AuthContext";
 
 interface SidebarProps {
   open?: boolean;
 }
 
-const navItems = [
-  {
-    label: "Dashboard",
-    href: "/",
-    icon: LayoutDashboard,
-  },
-  {
-    label: "Equipment",
-    href: "/equipment",
-    icon: Package,
-  },
-  {
-    label: "Maintenance Requests",
-    href: "/maintenance",
-    icon: Wrench,
-  },
-  {
-    label: "Calendar",
-    href: "/calendar",
-    icon: Calendar,
-  },
-  {
-    label: "Reports",
-    href: "/reports",
-    icon: BarChart3,
-  },
-];
-
 export function Sidebar({ open = true }: SidebarProps) {
   const location = useLocation();
+  const { user } = useAuth();
+
+  if (!user) return null;
+
+  const navItems =
+    user.role === "technician"
+      ? [
+        {
+          label: "Maintenance Requests",
+          href: "/maintenance",
+          icon: Wrench,
+        },
+        {
+          label: "Calendar",
+          href: "/calendar",
+          icon: Calendar,
+        },
+      ]
+      : [
+        {
+          label: "Dashboard",
+          href: "/dashboard",
+          icon: LayoutDashboard,
+        },
+        {
+          label: "Equipment",
+          href: "/equipment",
+          icon: Package,
+        },
+        {
+          label: "Maintenance Requests",
+          href: "/maintenance",
+          icon: Wrench,
+        },
+        {
+          label: "Calendar",
+          href: "/calendar",
+          icon: Calendar,
+        },
+        {
+          label: "Reports",
+          href: "/reports",
+          icon: BarChart3,
+        },
+      ];
 
   return (
     <aside
