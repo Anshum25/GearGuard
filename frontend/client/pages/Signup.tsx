@@ -73,10 +73,10 @@ export default function Signup() {
         }
     };
 
-    const handleSignup = (e: React.FormEvent) => {
+    const handleSignup = async (e: React.FormEvent) => {
         e.preventDefault();
         setError(null);
-        const res = signup({ email, password, role, fullName });
+        const res = await signup({ email, password, role, fullName });
         if (res.ok === false) {
             setError(res.error);
             return;

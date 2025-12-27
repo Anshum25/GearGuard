@@ -63,10 +63,10 @@ export default function Login() {
         }
     };
 
-    const handleLogin = (e: React.FormEvent) => {
+    const handleLogin = async (e: React.FormEvent) => {
         e.preventDefault();
         setError(null);
-        const res = login({ email, password });
+        const res = await login({ email, password });
         if (res.ok === false) {
             setError(res.error);
             return;

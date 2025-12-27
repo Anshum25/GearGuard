@@ -1,27 +1,32 @@
 import * as React from "react";
 const { createContext, useContext, useEffect, useMemo, useState } = React;
+import api from "@/lib/api";
+import { generateAvatarBlob } from "@/lib/avatar-placeholder";
 
 export type UserRole = "manager" | "technician";
 
 export interface AuthUser {
+    id: string;
     email: string;
     role: UserRole;
     fullName?: string;
-    teamName?: string;
+    avatar?: string;
+    username?: string;
 }
 
 interface StoredUser extends AuthUser {
     password: string;
-    fullName: string;
-    teamName?: string;
+    refreshToken?: string;
 }
 
 interface AuthContextValue {
     user: AuthUser | null;
     isAuthenticated: boolean;
-    login: (params: { email: string; password: string }) => { ok: true } | { ok: false; error: string };
-    signup: (params: { email: string; password: string; role: UserRole; fullName: string }) => { ok: true } | { ok: false; error: string };
+    isLoading: boolean;
+    login: (params: { email: string; password: string }) => Promise<{ ok: true } | { ok: false; error: string }>;
+    signup: (params: { email: string; password: string; role: UserRole; fullName: string }) => Promise<{ ok: true } | { ok: false; error: string }>;
     logout: () => void;
+    refreshUser: () => Promise<void>;
 }
 
 const STORAGE_SESSION_KEY = "gearguard_auth_session";
@@ -68,62 +73,119 @@ function writeSession(session: AuthUser | null) {
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
     const [user, setUser] = useState<AuthUser | null>(null);
+    const [isLoading, setIsLoading] = useState(true);
 
     useEffect(() => {
-        setUser(readSession());
+        // Check for existing session on mount
+        const checkAuth = async () => {
+            try {
+                const token = localStorage.getItem('accessToken');
+                if (token) {
+                    const response = await api.post('/api/v1/users/current-user');
+                    setUser(response.data.data.user);
+                }
+            } catch (error) {
+                // Token is invalid, clear it
+                localStorage.removeItem('accessToken');
+            } finally {
+                setIsLoading(false);
+            }
+        };
+        checkAuth();
     }, []);
 
-    const login: AuthContextValue["login"] = ({ email, password }) => {
-        const normalizedEmail = email.trim().toLowerCase();
-        if (!normalizedEmail || !password) return { ok: false, error: "Email and password are required." };
-
-        const users = readUsers();
-        const found = users.find((u) => u.email.toLowerCase() === normalizedEmail);
-        if (!found) return { ok: false, error: "Invalid email or password." };
-        if (found.password !== password) return { ok: false, error: "Invalid email or password." };
-
-        const session: AuthUser = { email: found.email, role: found.role, fullName: found.fullName };
-        writeSession(session);
-        setUser(session);
-        return { ok: true };
-    };
-
-    const signup: AuthContextValue["signup"] = ({ email, password, role, fullName }) => {
-        const normalizedEmail = email.trim().toLowerCase();
-        const trimmedFullName = fullName.trim();
-        
-        if (!normalizedEmail || !password || !trimmedFullName) {
-            return { ok: false, error: "All fields are required." };
+    const login: AuthContextValue["login"] = async ({ email, password }) => {
+        try {
+            const response = await api.post('/api/v1/users/login', {
+                email,
+                password
+            });
+            
+            const { user: loggedInUser, accessToken } = response.data.data;
+            
+            // Store token
+            localStorage.setItem('accessToken', accessToken);
+            
+            // Update user state
+            setUser(loggedInUser);
+            
+            return { ok: true };
+        } catch (error: any) {
+            const errorMessage = error.response?.data?.message || "Login failed. Please try again.";
+            return { ok: false, error: errorMessage };
         }
-        if (role !== "manager" && role !== "technician") return { ok: false, error: "Please select a role." };
-
-        const users = readUsers();
-        const exists = users.some((u) => u.email.toLowerCase() === normalizedEmail);
-        if (exists) return { ok: false, error: "An account with this email already exists." };
-
-        const newUser: StoredUser = { email: normalizedEmail, password, role, fullName: trimmedFullName };
-        writeUsers([newUser, ...users]);
-
-        const session: AuthUser = { email: newUser.email, role: newUser.role, fullName: newUser.fullName };
-        writeSession(session);
-        setUser(session);
-        return { ok: true };
     };
 
-    const logout = () => {
-        writeSession(null);
-        setUser(null);
+    const signup: AuthContextValue["signup"] = async ({ email, password, role, fullName }) => {
+        try {
+            // Map frontend role to backend role
+            const backendRole = role === 'manager' ? 'USER' : 'TECHNICIAN';
+            
+            // Generate username from email (backend expects username)
+            const username = email.split('@')[0] + Date.now();
+            
+            // Create FormData for avatar upload
+            const formData = new FormData();
+            formData.append('fullName', fullName);
+            formData.append('email', email);
+            formData.append('password', password);
+            formData.append('username', username);
+            formData.append('role', backendRole);
+            
+            // Generate avatar with initials
+            const avatarBlob = await generateAvatarBlob(fullName);
+            const avatarFile = new File([avatarBlob], 'avatar.png', { type: 'image/png' });
+            formData.append('avatar', avatarFile);
+            
+            const response = await api.post('/api/v1/users/register', formData, {
+                headers: {
+                    'Content-Type': 'multipart/form-data',
+                },
+            });
+            
+            // After successful registration, login automatically
+            return await login({ email, password });
+        } catch (error: any) {
+            const errorMessage = error.response?.data?.message || "Registration failed. Please try again.";
+            return { ok: false, error: errorMessage };
+        }
+    };
+
+    const logout = async () => {
+        try {
+            await api.post('/api/v1/users/logout');
+        } catch (error) {
+            // Continue with logout even if API call fails
+            console.error('Logout API call failed:', error);
+        } finally {
+            // Clear local state
+            localStorage.removeItem('accessToken');
+            setUser(null);
+        }
+    };
+    
+    const refreshUser = async () => {
+        try {
+            const response = await api.post('/api/v1/users/current-user');
+            setUser(response.data.data.user);
+        } catch (error) {
+            // Token is invalid, clear it
+            localStorage.removeItem('accessToken');
+            setUser(null);
+        }
     };
 
     const value = useMemo<AuthContextValue>(
         () => ({
             user,
             isAuthenticated: Boolean(user),
+            isLoading,
             login,
             signup,
             logout,
+            refreshUser,
         }),
-        [user],
+        [user, isLoading],
     );
 
     return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
