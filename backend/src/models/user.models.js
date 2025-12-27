@@ -6,6 +6,8 @@ import bcrypt from "bcrypt";
 const User = sequelize.define('User', {
     id: { type: DataTypes.UUID, defaultValue: DataTypes.UUIDV4, primaryKey: true },
     name: { type: DataTypes.STRING, allowNull: false },
+    fullName: { type: DataTypes.STRING, allowNull: false },
+    username: { type: DataTypes.STRING, allowNull: false, unique: true },
     email: { type: DataTypes.STRING, allowNull: false, unique: true, validate: { isEmail: true } },
     password: { type: DataTypes.STRING, allowNull: false },
     avatar: { type: DataTypes.STRING },
@@ -20,7 +22,7 @@ const User = sequelize.define('User', {
         validate: {
             // Custom validation: Team can only be assigned to Technicians
             isTechnician(value) {
-                if (value && this.role !== 'Technician') {
+                if (value && this.role !== 'TECHNICIAN') {
                     throw new Error('Only a Technician can be assigned to a team.');
                 }
             }
@@ -30,14 +32,21 @@ const User = sequelize.define('User', {
 }, {
     timestamps: true,
     hooks: {
-        // Automatically clear TeamId if the role is changed to 'User'
+        // Automatically clear TeamId if the role is changed to 'USER'
         beforeValidate: (user) => {
-            if (user.role === 'User') {
+            if (user.role === 'USER') {
                 user.TeamId = null;
             }
         },
-        beforeSave: async (user) => {
-            if (user.changed('password')) {
+        beforeCreate: async (user) => {
+            if (user.password && !user.password.startsWith('$2')) {
+                // Only hash if not already hashed (bcrypt hashes start with $2)
+                user.password = await bcrypt.hash(user.password, 10);
+            }
+        },
+        beforeUpdate: async (user) => {
+            if (user.changed('password') && !user.password.startsWith('$2')) {
+                // Only hash if password changed and not already hashed
                 user.password = await bcrypt.hash(user.password, 10);
             }
         }

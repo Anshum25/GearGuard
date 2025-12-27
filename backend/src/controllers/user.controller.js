@@ -32,8 +32,8 @@ const registerUser = asyncHandler( async (req, res) => {
     // check for user creation
     // return response
 
-    const {fullName, email, username, password} = req.body
-    console.log(`email : ${email}`)
+    const {fullName, email, username, password, role} = req.body
+    console.log('Registration request received:', { fullName, email, username, role: role || 'not provided' })
 
     if(
         [fullName, email, username, password].some((field) => field?.trim() === "")
@@ -51,39 +51,70 @@ const registerUser = asyncHandler( async (req, res) => {
     if(existedUser)
         throw new ApiError(409, "User with username or email already exists");
     const avatarLocalPath = req.file?.path;
+    console.log('Avatar file path:', avatarLocalPath);
 
     if(!avatarLocalPath)
     {
         throw new ApiError(400, "Avatar file is required")
     }
     
+    console.log('Uploading avatar to Cloudinary...');
     const avatar = await uploadOnCloudinary(avatarLocalPath);
+    console.log('Avatar upload result:', avatar ? 'Success' : 'Failed');
     
     if(!avatar)
     {
         throw new ApiError(400, "Avatar file is required")
     }
 
-    const user = await User.create({
-        fullName,
-        avatar:avatar.url,
-        email,
-        password,
-        username:username.toLowerCase()
-    })
+    // Validate role if provided
+    const userRole = role && ['USER', 'TECHNICIAN'].includes(role.toUpperCase()) 
+        ? role.toUpperCase() 
+        : 'USER';
 
-    const createdUser = await User.findByPk(user.id, {
-        attributes: { exclude: ['password', 'refreshToken'] }
-    })
+    try {
+        const user = await User.create({
+            fullName,
+            name: fullName, // Also set name field for backward compatibility
+            avatar:avatar.url,
+            email,
+            password,
+            username:username.toLowerCase(),
+            role: userRole
+        })
 
-    if(!createdUser)
-    {
-        throw new ApiError(500, "Something went wrong while registering the user")
+        console.log('User created successfully with ID:', user.id);
+
+        const createdUser = await User.findByPk(user.id, {
+            attributes: { exclude: ['password', 'refreshToken'] }
+        })
+
+        if(!createdUser)
+        {
+            throw new ApiError(500, "Something went wrong while registering the user")
+        }
+
+        return res.status(201).json(
+            new ApiResponse(200, createdUser, "user registered successfully")
+        )
+    } catch (error) {
+        console.error('Error creating user:', error);
+        // If it's a Sequelize validation error, provide more details
+        if (error.name === 'SequelizeValidationError') {
+            const messages = error.errors.map(err => err.message).join(', ');
+            throw new ApiError(400, `Validation error: ${messages}`);
+        }
+        // If it's a unique constraint error
+        if (error.name === 'SequelizeUniqueConstraintError') {
+            throw new ApiError(409, "User with this email or username already exists");
+        }
+        // Re-throw the error if it's already an ApiError
+        if (error instanceof ApiError) {
+            throw error;
+        }
+        // Otherwise, throw a generic error
+        throw new ApiError(500, `Error creating user: ${error.message}`);
     }
-
-    return res.status(201).json(
-        new ApiResponse(200, createdUser, "user registered successfully")
-    )
 } )
 
 const loginUser = asyncHandler( async (req, res) => {
@@ -251,7 +282,10 @@ const updateAccountDetails = asyncHandler(async (req, res) => {
     }
 
     // 3. Update fields
-    if (fullName) user.fullName = fullName;
+    if (fullName) {
+        user.fullName = fullName;
+        user.name = fullName; // Also update name field for backward compatibility
+    }
     if (email) user.email = email;
 
     // 4. Save to Database

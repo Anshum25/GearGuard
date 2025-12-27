@@ -4,8 +4,8 @@
   "main": "index.js",
   "type": "module",
   "scripts": {
-    "dev": "nodemon -r dotenv/config src/simple-server.js",
-    "dev:full": "nodemon -r dotenv/config --experimental-json-modules src/index.js"
+    "dev": "nodemon -r dotenv/config --experimental-json-modules src/index.js",
+    "dev:simple": "nodemon -r dotenv/config src/simple-server.js"
   },
   "author": "",
   "license": "ISC",
