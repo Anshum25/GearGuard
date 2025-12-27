@@ -1,21 +1,26 @@
-import React, { createContext, useContext, useEffect, useMemo, useState } from "react";
+import * as React from "react";
+const { createContext, useContext, useEffect, useMemo, useState } = React;
 
 export type UserRole = "manager" | "technician";
 
 export interface AuthUser {
     email: string;
     role: UserRole;
+    fullName?: string;
+    companyName?: string;
 }
 
 interface StoredUser extends AuthUser {
     password: string;
+    fullName: string;
+    companyName: string;
 }
 
 interface AuthContextValue {
     user: AuthUser | null;
     isAuthenticated: boolean;
     login: (params: { email: string; password: string }) => { ok: true } | { ok: false; error: string };
-    signup: (params: { email: string; password: string; role: UserRole }) => { ok: true } | { ok: false; error: string };
+    signup: (params: { email: string; password: string; role: UserRole; fullName: string; companyName: string }) => { ok: true } | { ok: false; error: string };
     logout: () => void;
 }
 
@@ -77,25 +82,30 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         if (!found) return { ok: false, error: "Invalid email or password." };
         if (found.password !== password) return { ok: false, error: "Invalid email or password." };
 
-        const session: AuthUser = { email: found.email, role: found.role };
+        const session: AuthUser = { email: found.email, role: found.role, fullName: found.fullName, companyName: found.companyName };
         writeSession(session);
         setUser(session);
         return { ok: true };
     };
 
-    const signup: AuthContextValue["signup"] = ({ email, password, role }) => {
+    const signup: AuthContextValue["signup"] = ({ email, password, role, fullName, companyName }) => {
         const normalizedEmail = email.trim().toLowerCase();
-        if (!normalizedEmail || !password) return { ok: false, error: "Email and password are required." };
+        const trimmedFullName = fullName.trim();
+        const trimmedCompanyName = companyName.trim();
+        
+        if (!normalizedEmail || !password || !trimmedFullName || !trimmedCompanyName) {
+            return { ok: false, error: "All fields are required." };
+        }
         if (role !== "manager" && role !== "technician") return { ok: false, error: "Please select a role." };
 
         const users = readUsers();
         const exists = users.some((u) => u.email.toLowerCase() === normalizedEmail);
         if (exists) return { ok: false, error: "An account with this email already exists." };
 
-        const newUser: StoredUser = { email: normalizedEmail, password, role };
+        const newUser: StoredUser = { email: normalizedEmail, password, role, fullName: trimmedFullName, companyName: trimmedCompanyName };
         writeUsers([newUser, ...users]);
 
-        const session: AuthUser = { email: newUser.email, role: newUser.role };
+        const session: AuthUser = { email: newUser.email, role: newUser.role, fullName: newUser.fullName, companyName: newUser.companyName };
         writeSession(session);
         setUser(session);
         return { ok: true };
