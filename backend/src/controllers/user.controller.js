@@ -5,7 +5,6 @@ import { uploadOnCloudinary } from '../utils/cloudinary.js';
 import { ApiResponse } from '../utils/ApiResponse.js';
 import jwt from "jsonwebtoken"
 import { Op } from 'sequelize';
-import { redisClient } from "../db/redis.js";
 
 const generateAccessAndRefreshTokens = async (userId) => {
     try {
@@ -258,13 +257,7 @@ const updateAccountDetails = asyncHandler(async (req, res) => {
     // 4. Save to Database
     await user.save();
 
-    // 5. CACHE INVALIDATION
-    // Since getUserProfile uses `profile:${username}` as the key, 
-    // we must delete it so the next fetch gets the fresh data from the DB.
-    const cacheKey = `profile:${user.username}`;
-    await redisClient.del(cacheKey);
-
-    // 6. Prepare response (No need for a second DB query)
+    // 5. Prepare response (No need for a second DB query)
     // Sequelize instances can be converted to plain objects
     const updatedUser = user.toJSON();
     delete updatedUser.password;
@@ -276,7 +269,7 @@ const updateAccountDetails = asyncHandler(async (req, res) => {
             new ApiResponse(
                 200, 
                 updatedUser, 
-                "Account details updated and cache cleared successfully"
+                "Account details updated successfully"
             )
         );
 });
@@ -325,13 +318,6 @@ const getUserProfile = asyncHandler(async (req, res) => {
 
     if (!user) {
         throw new ApiError(404, "User not found");
-    }
-
-    // Save to Redis if middleware provided a key
-    if (req.cacheKey) {
-        await redisClient.set(req.cacheKey, JSON.stringify(user), {
-            EX: req.cacheTTL
-        });
     }
 
     return res

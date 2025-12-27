@@ -1,6 +1,7 @@
 import express from 'express';
 import cors from 'cors';
 import dotenv from 'dotenv';
+import multer from 'multer';
 
 dotenv.config();
 
@@ -15,19 +16,29 @@ app.use(cors({
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
+// Configure multer for file uploads
+const upload = multer({ storage: multer.memoryStorage() });
+
 // Mock endpoints
-app.post('/api/v1/users/register', (req, res) => {
-    console.log('Register request:', req.body);
+app.post('/api/v1/users/register', upload.single('avatar'), (req, res) => {
+    console.log('Register request body:', req.body);
+    console.log('Register file:', req.file);
+    
+    // Handle FormData with multer
+    const userData = {
+        fullName: req.body.fullName,
+        email: req.body.email,
+        role: req.body.role === 'USER' ? 'manager' : 'technician',
+        avatar: null
+    };
+    
     res.status(200).json({
         success: true,
         message: "Registration endpoint working (mock)",
         data: {
             user: {
                 id: "mock-id",
-                email: req.body.email,
-                fullName: req.body.fullName,
-                role: req.body.role === 'USER' ? 'manager' : 'technician',
-                avatar: null
+                ...userData
             }
         }
     });
