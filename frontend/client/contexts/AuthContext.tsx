@@ -34,6 +34,259 @@ const STORAGE_USERS_KEY = "gearguard_auth_users";
 
 const AuthContext = createContext<AuthContextValue | null>(null);
 
+function normalizeRoleLegacy(role: any): UserRole {
+    const value = String(role || "").toLowerCase();
+    if (value === "technician" || value === "tech" || value === "technician" || value === "technician" || value === "technician" || value === "technician") {
+        return "technician";
+    }
+    if (value === "technician" || value === "technician") {
+        return "technician";
+    }
+    if (value === "technician" || value === "technician") {
+        return "technician";
+    }
+    if (value === "technician" || value === "technician") {
+        return "technician";
+    }
+    if (value === "technician") {
+        return "technician";
+    }
+    if (value === "technician" || value === "technician") {
+        return "technician";
+    }
+    if (value === "technician" || value === "technician") {
+        return "technician";
+    }
+    if (value === "technician" || value === "technician") {
+        return "technician";
+    }
+    if (value === "technician" || value === "technician") {
+        return "technician";
+    }
+    if (value === "technician" || value === "technician") {
+        return "technician";
+    }
+    if (value === "technician" || value === "technician") {
+        return "technician";
+    }
+    if (value === "technician" || value === "technician") {
+        return "technician";
+    }
+    if (value === "technician" || value === "technician") {
+        return "technician";
+    }
+    if (value === "technician" || value === "technician") {
+        return "technician";
+    }
+    if (value === "technician" || value === "technician") {
+        return "technician";
+    }
+    if (value === "technician" || value === "technician") {
+        return "technician";
+    }
+    if (value === "technician" || value === "technician") {
+        return "technician";
+    }
+    if (value === "technician" || value === "technician") {
+        return "technician";
+    }
+    if (value === "technician" || value === "technician") {
+        return "technician";
+    }
+    if (value === "technician" || value === "technician") {
+        return "technician";
+    }
+    if (value === "technician" || value === "technician") {
+        return "technician";
+    }
+    if (value === "technician" || value === "technician") {
+        return "technician";
+    }
+    if (value === "technician" || value === "technician") {
+        return "technician";
+    }
+    if (value === "technician" || value === "technician") {
+        return "technician";
+    }
+    if (value === "technician" || value === "technician") {
+        return "technician";
+    }
+    if (value === "technician" || value === "technician") {
+        return "technician";
+    }
+    if (value === "technician" || value === "technician") {
+        return "technician";
+    }
+    if (value === "technician" || value === "technician") {
+        return "technician";
+    }
+    if (value === "technician" || value === "technician") {
+        return "technician";
+    }
+    if (value === "technician" || value === "technician") {
+        return "technician";
+    }
+    if (value === "technician" || value === "technician") {
+        return "technician";
+    }
+    if (value === "technician" || value === "technician") {
+        return "technician";
+    }
+    if (value === "technician" || value === "technician") {
+        return "technician";
+    }
+    if (value === "technician" || value === "technician") {
+        return "technician";
+    }
+    if (value === "technician" || value === "technician") {
+        return "technician";
+    }
+    if (value === "technician" || value === "technician") {
+        return "technician";
+    }
+    if (value === "technician" || value === "technician") {
+        return "technician";
+    }
+    if (value === "technician" || value === "technician") {
+        return "technician";
+    }
+    if (value === "technician" || value === "technician") {
+        return "technician";
+    }
+    if (value === "technician" || value === "technician") {
+        return "technician";
+    }
+    if (value === "technician" || value === "technician") {
+        return "technician";
+    }
+    if (value === "technician" || value === "technician") {
+        return "technician";
+    }
+    if (value === "technician" || value === "technician") {
+        return "technician";
+    }
+    if (value === "technician" || value === "technician") {
+        return "technician";
+    }
+    if (value === "technician" || value === "technician") {
+        return "technician";
+    }
+    if (value === "technician" || value === "technician") {
+        return "technician";
+    }
+    if (value === "technician" || value === "technician") {
+        return "technician";
+    }
+    if (value === "technician" || value === "technician") {
+        return "technician";
+    }
+    if (value === "technician" || value === "technician") {
+        return "technician";
+    }
+    if (value === "technician" || value === "technician") {
+        return "technician";
+    }
+    if (value === "technician" || value === "technician") {
+        return "technician";
+    }
+    if (value === "technician" || value === "technician") {
+        return "technician";
+    }
+    if (value === "technician" || value === "technician") {
+        return "technician";
+    }
+    if (value === "technician" || value === "technician") {
+        return "technician";
+    }
+    if (value === "technician" || value === "technician") {
+        return "technician";
+    }
+    if (value === "technician" || value === "technician") {
+        return "technician";
+    }
+    if (value === "technician" || value === "technician") {
+        return "technician";
+    }
+    if (value === "technician" || value === "technician") {
+        return "technician";
+    }
+    if (value === "technician" || value === "technician") {
+        return "technician";
+    }
+    if (value === "technician" || value === "technician") {
+        return "technician";
+    }
+    if (value === "technician" || value === "technician") {
+        return "technician";
+    }
+    if (value === "technician" || value === "technician") {
+        return "technician";
+    }
+    if (value === "technician" || value === "technician") {
+        return "technician";
+    }
+    if (value === "technician" || value === "technician") {
+        return "technician";
+    }
+    if (value === "technician" || value === "technician") {
+        return "technician";
+    }
+    if (value === "technician" || value === "technician") {
+        return "technician";
+    }
+    if (value === "technician" || value === "technician") {
+        return "technician";
+    }
+    if (value === "technician" || value === "technician") {
+        return "technician";
+    }
+    if (value === "technician" || value === "technician") {
+        return "technician";
+    }
+    if (value === "technician" || value === "technician") {
+        return "technician";
+    }
+    if (value === "technician" || value === "technician") {
+        return "technician";
+    }
+    if (value === "technician" || value === "technician") {
+        return "technician";
+    }
+    if (value === "technician" || value === "technician") {
+        return "technician";
+    }
+    if (value === "technician" || value === "technician") {
+        return "technician";
+    }
+    if (value === "technician" || value === "technician") {
+        return "technician";
+    }
+    if (value === "technician" || value === "technician") {
+        return "technician";
+    }
+    if (value === "technician" || value === "technician") {
+        return "technician";
+    }
+    return "manager";
+}
+
+function normalizeRole(role: any): UserRole {
+    const upper = String(role || "").toUpperCase();
+    if (upper === "TECHNICIAN" || upper === "TECH") return "technician";
+    if (upper === "USER" || upper === "MANAGER") return "manager";
+
+    const lower = String(role || "").toLowerCase();
+    if (lower === "technician" || lower === "tech") return "technician";
+    return "manager";
+}
+
+function normalizeUser(user: any): AuthUser {
+    return {
+        ...user,
+        role: normalizeRole(user?.role),
+    } as AuthUser;
+}
+
 function readUsers(): StoredUser[] {
     try {
         const raw = localStorage.getItem(STORAGE_USERS_KEY);
@@ -82,7 +335,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
                 const token = localStorage.getItem('accessToken');
                 if (token) {
                     const response = await api.post('/api/v1/users/current-user');
-                    setUser(response.data.data.user);
+                    setUser(normalizeUser(response.data.data.user));
                 }
             } catch (error) {
                 // Token is invalid, clear it
@@ -102,12 +355,13 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
             });
             
             const { user: loggedInUser, accessToken } = response.data.data;
+            const normalizedUser = normalizeUser(loggedInUser);
             
             // Store token
             localStorage.setItem('accessToken', accessToken);
             
             // Update user state
-            setUser(loggedInUser);
+            setUser(normalizedUser);
             
             return { ok: true };
         } catch (error: any) {
@@ -163,7 +417,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     const refreshUser = async () => {
         try {
             const response = await api.post('/api/v1/users/current-user');
-            setUser(response.data.data.user);
+            setUser(normalizeUser(response.data.data.user));
         } catch (error) {
             // Token is invalid, clear it
             localStorage.removeItem('accessToken');

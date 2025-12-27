@@ -128,9 +128,17 @@ const loginUser = asyncHandler( async (req, res) => {
         throw new ApiError(400, "username or password is required")
     }
 
+    const orConditions = [];
+    if (email) orConditions.push({ email });
+    if (username) orConditions.push({ username });
+
+    if (orConditions.length === 0) {
+        throw new ApiError(400, "username or email is required")
+    }
+
     const user = await User.findOne({
         where: {
-            [Op.or]:[{email}, {username}]
+            [Op.or]: orConditions
         }
     })
 
@@ -180,9 +188,11 @@ const logoutUser = asyncHandler(async (req, res) => {
     user.refreshToken = null;
     await user.save();
 
+    const isProduction = process.env.NODE_ENV === "production";
     const options = {
-        httpOnly:true,
-        secure:true,
+        httpOnly: true,
+        secure: isProduction,
+        sameSite: isProduction ? "none" : "lax",
     }
 
     return res
