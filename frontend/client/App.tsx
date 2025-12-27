@@ -39,7 +39,7 @@ const App = () => (
                 path="/auth"
                 element={
                   <PublicLayout>
-                    <AuthLanding />
+                    <Signup />
                   </PublicLayout>
                 }
               />
