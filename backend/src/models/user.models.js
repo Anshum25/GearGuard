@@ -3,23 +3,39 @@ import { sequelize } from "../db/index.js";
 import jwt from "jsonwebtoken";
 import bcrypt from "bcrypt";
 
-// models/User.js
 const User = sequelize.define('User', {
     id: { type: DataTypes.UUID, defaultValue: DataTypes.UUIDV4, primaryKey: true },
-    username: { type: DataTypes.STRING, allowNull: false, unique: true, lowercase: true },
+    name: { type: DataTypes.STRING, allowNull: false },
     email: { type: DataTypes.STRING, allowNull: false, unique: true, validate: { isEmail: true } },
-    fullName: { type: DataTypes.STRING, allowNull: false },
-    avatar: { type: DataTypes.STRING, allowNull: false },
     password: { type: DataTypes.STRING, allowNull: false },
+    avatar: { type: DataTypes.STRING },
     role: { 
         type: DataTypes.ENUM('USER', 'TECHNICIAN'), 
-        defaultValue: 'USER', 
+        defaultValue: 'USER',
         allowNull: false 
+    },
+    TeamId: {
+        type: DataTypes.UUID,
+        allowNull: true,
+        validate: {
+            // Custom validation: Team can only be assigned to Technicians
+            isTechnician(value) {
+                if (value && this.role !== 'Technician') {
+                    throw new Error('Only a Technician can be assigned to a team.');
+                }
+            }
+        }
     },
     refreshToken: { type: DataTypes.STRING }
 }, {
     timestamps: true,
     hooks: {
+        // Automatically clear TeamId if the role is changed to 'User'
+        beforeValidate: (user) => {
+            if (user.role === 'User') {
+                user.TeamId = null;
+            }
+        },
         beforeSave: async (user) => {
             if (user.changed('password')) {
                 user.password = await bcrypt.hash(user.password, 10);

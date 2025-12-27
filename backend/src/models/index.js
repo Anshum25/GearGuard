@@ -1,34 +1,25 @@
-// models/index.js
+// src/models/index.js
 import { User } from "./user.models.js";
+import { Team } from "./team.models.js";
 import { Equipment } from "./equipment.models.js";
-import { MaintenanceTeam } from "./team.models.js";
-import { MaintenanceRequest } from "./maintenancerequest.models.js";
-import { Department } from "./department.models.js"; // New Import
+import { Request } from "./request.models.js";
 
-// --- OWNERSHIP ASSOCIATIONS ---
+// --- 1. USER & TEAM ASSOCIATIONS ---
+User.belongsTo(Team, { foreignKey: 'TeamId' });
+Team.hasMany(User, { as: 'members', foreignKey: 'TeamId' });
 
-// Equipment belongs to a Department OR an Employee 
-Equipment.belongsTo(Department, { foreignKey: 'departmentId' });
-Department.hasMany(Equipment, { foreignKey: 'departmentId' });
+// --- 2. EQUIPMENT & TEAM ASSOCIATIONS ---
+Equipment.belongsTo(Team, { as: 'maintenanceTeam', foreignKey: 'MaintenanceTeamId' });
+Team.hasMany(Equipment, { foreignKey: 'MaintenanceTeamId' });
 
-Equipment.belongsTo(User, { as: 'employee', foreignKey: 'employeeId' });
-User.hasMany(Equipment, { foreignKey: 'employeeId' });
+// --- 3. REQUEST ASSOCIATIONS ---
+Request.belongsTo(Equipment, { foreignKey: 'EquipmentId' });
+Equipment.hasMany(Request, { foreignKey: 'EquipmentId' });
 
-// --- MAINTENANCE ASSOCIATIONS ---
+Request.belongsTo(User, { as: 'technician', foreignKey: 'UserId' });
+User.hasMany(Request, { foreignKey: 'UserId' });
 
-// Equipment & Team: Every asset must have a default team [cite: 12]
-Equipment.belongsTo(MaintenanceTeam, { foreignKey: 'maintenanceTeamId' });
-MaintenanceTeam.hasMany(Equipment, { foreignKey: 'maintenanceTeamId' });
+Request.belongsTo(Team, { foreignKey: 'TeamId' });
+Team.hasMany(Request, { foreignKey: 'TeamId' });
 
-// Maintenance Request Links [cite: 33, 41, 43]
-MaintenanceRequest.belongsTo(Equipment);
-MaintenanceRequest.belongsTo(MaintenanceTeam);
-MaintenanceRequest.belongsTo(User, { as: 'technician', foreignKey: 'technicianId' });
-
-export {
-    User,
-    Equipment,
-    MaintenanceTeam,
-    MaintenanceRequest,
-    Department
-};
+export { User, Team, Equipment, Request };
