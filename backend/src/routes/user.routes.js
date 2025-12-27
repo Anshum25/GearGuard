@@ -1,4 +1,4 @@
-import { Router } from "express";
+import express from "express";
 
 import { 
     changeCurrentUserPassword, 
@@ -15,7 +15,7 @@ import {
 import {upload} from '../middleware/multer.middleware.js'
 import { verifyJWT } from "../middleware/auth.middleware.js";
 
-const router = Router()
+const router = express.Router()
 
 // working
 router.route("/register").post(

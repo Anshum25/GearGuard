@@ -5,6 +5,7 @@ import { uploadOnCloudinary } from '../utils/cloudinary.js';
 import { ApiResponse } from '../utils/ApiResponse.js';
 import jwt from "jsonwebtoken"
 import { Op } from 'sequelize';
+import path from "path";
 
 const generateAccessAndRefreshTokens = async (userId) => {
     try {
@@ -53,18 +54,15 @@ const registerUser = asyncHandler( async (req, res) => {
     const avatarLocalPath = req.file?.path;
     console.log('Avatar file path:', avatarLocalPath);
 
-    if(!avatarLocalPath)
-    {
-        throw new ApiError(400, "Avatar file is required")
-    }
-    
-    console.log('Uploading avatar to Cloudinary...');
-    const avatar = await uploadOnCloudinary(avatarLocalPath);
-    console.log('Avatar upload result:', avatar ? 'Success' : 'Failed');
-    
-    if(!avatar)
-    {
-        throw new ApiError(400, "Avatar file is required")
+    let avatarUrl;
+    if (avatarLocalPath) {
+        console.log('Uploading avatar to Cloudinary...');
+        const avatar = await uploadOnCloudinary(avatarLocalPath);
+        console.log('Avatar upload result:', avatar ? 'Success' : 'Failed');
+
+        avatarUrl = avatar?.url
+            ? avatar.url
+            : `/temp/${path.basename(avatarLocalPath)}`;
     }
 
     // Validate role if provided
@@ -76,7 +74,7 @@ const registerUser = asyncHandler( async (req, res) => {
         const user = await User.create({
             fullName,
             name: fullName, // Also set name field for backward compatibility
-            avatar:avatar.url,
+            avatar: avatarUrl,
             email,
             password,
             username:username.toLowerCase(),
@@ -94,9 +92,7 @@ const registerUser = asyncHandler( async (req, res) => {
             throw new ApiError(500, "Something went wrong while registering the user")
         }
 
-        return res.status(201).json(
-            new ApiResponse(200, createdUser, "user registered successfully")
-        )
+        return res.status(201).json(new ApiResponse(201, createdUser, "user registered successfully"))
     } catch (error) {
         console.error('Error creating user:', error);
         // If it's a Sequelize validation error, provide more details
@@ -155,9 +151,11 @@ const loginUser = asyncHandler( async (req, res) => {
         attributes: { exclude: ['password', 'refreshToken'] }
     })
   
+    const isProduction = process.env.NODE_ENV === "production";
     const options = {
-        httpOnly:true,
-        secure:true,
+        httpOnly: true,
+        secure: isProduction,
+        sameSite: isProduction ? "none" : "lax",
     }
 
     return res
@@ -215,9 +213,11 @@ const refreshAccessToken = asyncHandler(async (req, res) => {
             throw new ApiError(401 ,"Refresh token is expired or used")
         }
     
+        const isProduction = process.env.NODE_ENV === "production";
         const options = {
-            httpOnly:true,
-            secure:true
+            httpOnly: true,
+            secure: isProduction,
+            sameSite: isProduction ? "none" : "lax",
         }
     
         const {accessToken, newRefreshToken } = await generateAccessAndRefreshTokens(user.id)

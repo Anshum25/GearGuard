@@ -137,11 +137,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
             const avatarFile = new File([avatarBlob], 'avatar.png', { type: 'image/png' });
             formData.append('avatar', avatarFile);
             
-            const response = await api.post('/api/v1/users/register', formData, {
-                headers: {
-                    'Content-Type': 'multipart/form-data',
-                },
-            });
+            const response = await api.post('/api/v1/users/register', formData);
             
             // After successful registration, login automatically
             return await login({ email, password });
