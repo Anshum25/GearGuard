@@ -12,6 +12,8 @@ import {
     updateUserAvatar,
 } from "../controllers/user.controller.js";
 
+import { cacheMiddleware } from "../middleware/cache.middleware.js";
+
 import {upload} from '../middleware/multer.middleware.js'
 import { verifyJWT } from "../middleware/auth.middleware.js";
 
@@ -49,8 +51,10 @@ router.route("/update-avatar").patch(
     updateUserAvatar
 )
 
-// working
-router.route("/c/:username").get(verifyJWT, getUserProfile)
-
+router.route("/c/:username").get(
+    verifyJWT, 
+    cacheMiddleware("profile", 3600), 
+    getUserProfile
+);
 
 export default router

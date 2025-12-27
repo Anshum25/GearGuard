@@ -5,6 +5,7 @@ import { uploadOnCloudinary } from '../utils/cloudinary.js';
 import { ApiResponse } from '../utils/ApiResponse.js';
 import jwt from "jsonwebtoken"
 import { Op } from 'sequelize';
+import { redisClient } from "../db/redis.js";
 
 const generateAccessAndRefreshTokens = async (userId) => {
     try {
@@ -236,33 +237,49 @@ const getCurrentUser = asyncHandler(async (req, res) => {
 })
 
 const updateAccountDetails = asyncHandler(async (req, res) => {
-    const {fullName, email} = req.body
+    const { fullName, email } = req.body;
 
-    if(!(fullName || email))
-    {
-        throw new ApiError(400, "All fields are required")
+    // 1. Validation
+    if (!fullName && !email) {
+        throw new ApiError(400, "fullName or email is required to update");
     }
-    console.log(req.user)
+
+    // 2. Find the user
     const user = await User.findByPk(req.user.id);
-    
-    if(fullName) user.fullName = fullName;
-    if(email) user.email = email;
-    
-    await user.save();
-    
-    const updatedUser = await User.findByPk(req.user.id, {
-        attributes: { exclude: ['password'] }
-    });
 
-    if(!user)
-    {
-
+    if (!user) {
+        throw new ApiError(404, "User not found");
     }
+
+    // 3. Update fields
+    if (fullName) user.fullName = fullName;
+    if (email) user.email = email;
+
+    // 4. Save to Database
+    await user.save();
+
+    // 5. CACHE INVALIDATION
+    // Since getUserProfile uses `profile:${username}` as the key, 
+    // we must delete it so the next fetch gets the fresh data from the DB.
+    const cacheKey = `profile:${user.username}`;
+    await redisClient.del(cacheKey);
+
+    // 6. Prepare response (No need for a second DB query)
+    // Sequelize instances can be converted to plain objects
+    const updatedUser = user.toJSON();
+    delete updatedUser.password;
+    delete updatedUser.refreshToken;
 
     return res
-    .status(200)
-    .json(new ApiResponse(200, updatedUser, "Account details updated successfully"))
-})
+        .status(200)
+        .json(
+            new ApiResponse(
+                200, 
+                updatedUser, 
+                "Account details updated and cache cleared successfully"
+            )
+        );
+});
 
 const updateUserAvatar = asyncHandler(async (req, res) => {
     const avatarLocalPath = req.file?.path;
@@ -294,26 +311,33 @@ const updateUserAvatar = asyncHandler(async (req, res) => {
     )
 })
 
-const getUserProfile = asyncHandler(async (req, res) =>{
-    const {username} = req.params
+const getUserProfile = asyncHandler(async (req, res) => {
+    const { username } = req.params;
 
-    console.log(`username : ${username}`)
-    if(!username?.trim()){
-        throw new ApiError(400, "username is missing")
+    if (!username?.trim()) {
+        throw new ApiError(400, "username is missing");
     }
 
     const user = await User.findOne({
-        where: { username }
-    })
+        where: { username },
+        attributes: { exclude: ['password', 'refreshToken'] }
+    });
 
-    console.log(user)
+    if (!user) {
+        throw new ApiError(404, "User not found");
+    }
+
+    // Save to Redis if middleware provided a key
+    if (req.cacheKey) {
+        await redisClient.set(req.cacheKey, JSON.stringify(user), {
+            EX: req.cacheTTL
+        });
+    }
 
     return res
-    .status(200)
-    .json(
-        new ApiResponse(200, user, "This api is not working")
-    )
-})
+        .status(200)
+        .json(new ApiResponse(200, user, "User profile fetched successfully"));
+});
 
 export { 
     registerUser,
