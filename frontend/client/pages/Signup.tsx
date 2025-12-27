@@ -18,7 +18,6 @@ export default function Signup() {
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
     const [fullName, setFullName] = useState("");
-    const [companyName, setCompanyName] = useState("");
     const [role, setRole] = useState<UserRole>("manager");
     const [error, setError] = useState<string | null>(null);
     const [showPassword, setShowPassword] = useState(false);
@@ -27,9 +26,8 @@ export default function Signup() {
     const [emailValid, setEmailValid] = useState<boolean | null>(null);
     const [passwordValid, setPasswordValid] = useState<boolean | null>(null);
     const [fullNameValid, setFullNameValid] = useState<boolean | null>(null);
-    const [companyValid, setCompanyValid] = useState<boolean | null>(null);
 
-    const canSubmit = email.trim().length > 0 && password.length >= 8 && fullName.trim().length > 0 && companyName.trim().length > 0 && emailValid === true && passwordValid === true && fullNameValid === true && companyValid === true;
+    const canSubmit = email.trim().length > 0 && password.length >= 8 && fullName.trim().length > 0 && emailValid === true && passwordValid === true && fullNameValid === true;
     
     // Validation functions
     const validateEmail = (email: string) => {
@@ -44,11 +42,6 @@ export default function Signup() {
     const validateFullName = (name: string) => {
         return name.trim().length >= 2;
     };
-    
-    const validateCompany = (company: string) => {
-        return company.trim().length >= 2;
-    };
-    
     // Handle input changes with validation
     const handleEmailChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const value = e.target.value;
@@ -79,21 +72,11 @@ export default function Signup() {
             setFullNameValid(null);
         }
     };
-    
-    const handleCompanyChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        const value = e.target.value;
-        setCompanyName(value);
-        if (value.length > 0) {
-            setCompanyValid(validateCompany(value));
-        } else {
-            setCompanyValid(null);
-        }
-    };
 
     const handleSignup = (e: React.FormEvent) => {
         e.preventDefault();
         setError(null);
-        const res = signup({ email, password, role, fullName, companyName });
+        const res = signup({ email, password, role, fullName });
         if (res.ok === false) {
             setError(res.error);
             return;
@@ -118,56 +101,29 @@ export default function Signup() {
                     </div>
 
                     <form className="mt-6 space-y-5" onSubmit={handleSignup}>
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                            <div className="grid gap-2">
-                                <Label htmlFor="fullName" className="text-sm font-medium">Full Name</Label>
-                                <div className="relative">
-                                    <User className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-                                    <Input
-                                        id="fullName"
-                                        type="text"
-                                        value={fullName}
-                                        onChange={handleFullNameChange}
-                                        placeholder="John Doe"
-                                        autoComplete="name"
-                                        className={`pl-10 pr-10 ${fullNameValid === true ? 'border-green-500 focus:border-green-500' : fullNameValid === false ? 'border-red-500 focus:border-red-500' : ''}`}
-                                    />
-                                    {fullNameValid === true && (
-                                        <CheckCircle className="absolute right-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-green-500" />
-                                    )}
-                                    {fullNameValid === false && (
-                                        <AlertCircle className="absolute right-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-red-500" />
-                                    )}
-                                </div>
+                        <div className="grid gap-2">
+                            <Label htmlFor="fullName" className="text-sm font-medium">Full Name</Label>
+                            <div className="relative">
+                                <User className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+                                <Input
+                                    id="fullName"
+                                    type="text"
+                                    value={fullName}
+                                    onChange={handleFullNameChange}
+                                    placeholder="John Doe"
+                                    autoComplete="name"
+                                    className={`pl-10 pr-10 ${fullNameValid === true ? 'border-green-500 focus:border-green-500' : fullNameValid === false ? 'border-red-500 focus:border-red-500' : ''}`}
+                                />
+                                {fullNameValid === true && (
+                                    <CheckCircle className="absolute right-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-green-500" />
+                                )}
                                 {fullNameValid === false && (
-                                    <p className="text-xs text-red-500">Name must be at least 2 characters</p>
+                                    <AlertCircle className="absolute right-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-red-500" />
                                 )}
                             </div>
-
-                            <div className="grid gap-2">
-                                <Label htmlFor="companyName" className="text-sm font-medium">Company Name</Label>
-                                <div className="relative">
-                                    <Building className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-                                    <Input
-                                        id="companyName"
-                                        type="text"
-                                        value={companyName}
-                                        onChange={handleCompanyChange}
-                                        placeholder="Acme Corp"
-                                        autoComplete="organization"
-                                        className={`pl-10 pr-10 ${companyValid === true ? 'border-green-500 focus:border-green-500' : companyValid === false ? 'border-red-500 focus:border-red-500' : ''}`}
-                                    />
-                                    {companyValid === true && (
-                                        <CheckCircle className="absolute right-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-green-500" />
-                                    )}
-                                    {companyValid === false && (
-                                        <AlertCircle className="absolute right-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-red-500" />
-                                    )}
-                                </div>
-                                {companyValid === false && (
-                                    <p className="text-xs text-red-500">Company name must be at least 2 characters</p>
-                                )}
-                            </div>
+                            {fullNameValid === false && (
+                                <p className="text-xs text-red-500">Name must be at least 2 characters</p>
+                            )}
                         </div>
 
                         <div className="grid gap-2">
