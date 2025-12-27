@@ -3,45 +3,20 @@ import { sequelize } from "../db/index.js";
 import jwt from "jsonwebtoken";
 import bcrypt from "bcrypt";
 
+// models/User.js
 const User = sequelize.define('User', {
-    id: {
-        type: DataTypes.UUID,
-        defaultValue: DataTypes.UUIDV4,
-        primaryKey: true
+    id: { type: DataTypes.UUID, defaultValue: DataTypes.UUIDV4, primaryKey: true },
+    username: { type: DataTypes.STRING, allowNull: false, unique: true, lowercase: true },
+    email: { type: DataTypes.STRING, allowNull: false, unique: true, validate: { isEmail: true } },
+    fullName: { type: DataTypes.STRING, allowNull: false },
+    avatar: { type: DataTypes.STRING, allowNull: false },
+    password: { type: DataTypes.STRING, allowNull: false },
+    role: { 
+        type: DataTypes.ENUM('USER', 'TECHNICIAN'), 
+        defaultValue: 'USER', 
+        allowNull: false 
     },
-    username: {
-        type: DataTypes.STRING,
-        allowNull: false,
-        unique: true,
-        lowercase: true,
-        trim: true
-    },
-    email: {
-        type: DataTypes.STRING,
-        allowNull: false,
-        unique: true,
-        lowercase: true,
-        trim: true,
-        validate: {
-            isEmail: true
-        }
-    },
-    fullName: {
-        type: DataTypes.STRING,
-        allowNull: false,
-        trim: true
-    },
-    avatar: {
-        type: DataTypes.STRING,
-        allowNull: false
-    },
-    password: {
-        type: DataTypes.STRING,
-        allowNull: false
-    },
-    refreshToken: {
-        type: DataTypes.STRING
-    }
+    refreshToken: { type: DataTypes.STRING }
 }, {
     timestamps: true,
     hooks: {
