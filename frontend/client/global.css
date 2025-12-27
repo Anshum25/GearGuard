@@ -1,0 +1,128 @@
+/** @import must precede all other statements */
+@import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap");
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  /**
+   * Tailwind CSS theme
+   * tailwind.config.ts expects the following color variables to be expressed as HSL values.
+   * A different format will require also updating the theme in tailwind.config.ts.
+   * Odoo Enterprise Design System
+  */
+  :root {
+    --background: 0 0% 100%;
+    --foreground: 219 14% 23%;
+
+    --card: 0 0% 100%;
+    --card-foreground: 219 14% 23%;
+
+    --popover: 0 0% 100%;
+    --popover-foreground: 219 14% 23%;
+
+    /* Odoo Purple Primary */
+    --primary: 263 80% 40%;
+    --primary-foreground: 0 0% 100%;
+
+    --secondary: 210 40% 96.1%;
+    --secondary-foreground: 263 80% 40%;
+
+    --muted: 210 40% 96.1%;
+    --muted-foreground: 215.4 16.3% 46.9%;
+
+    --accent: 263 80% 40%;
+    --accent-foreground: 0 0% 100%;
+
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 210 40% 98%;
+
+    --border: 210 40% 93%;
+    --input: 210 40% 96%;
+    --ring: 263 80% 40%;
+
+    --radius: 0.375rem;
+
+    /* Sidebar - Light Odoo style */
+    --sidebar-background: 0 0% 100%;
+    --sidebar-foreground: 219 14% 23%;
+    --sidebar-primary: 263 80% 40%;
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: 210 40% 96%;
+    --sidebar-accent-foreground: 263 80% 40%;
+    --sidebar-border: 210 40% 93%;
+    --sidebar-ring: 263 80% 40%;
+
+    /* Status Colors for GearGuard */
+    --status-new: 0 0% 60%; /* Grey */
+    --status-in-progress: 217 91% 60%; /* Blue */
+    --status-repaired: 142 71% 45%; /* Green */
+    --status-scrap: 0 84% 60%; /* Red */
+  }
+
+  .dark {
+    --background: 219 14% 10%;
+    --foreground: 0 0% 98%;
+
+    --card: 219 14% 15%;
+    --card-foreground: 0 0% 98%;
+
+    --popover: 219 14% 15%;
+    --popover-foreground: 0 0% 98%;
+
+    --primary: 263 80% 55%;
+    --primary-foreground: 219 14% 10%;
+
+    --secondary: 219 20% 25%;
+    --secondary-foreground: 0 0% 98%;
+
+    --muted: 219 20% 25%;
+    --muted-foreground: 215 20% 65%;
+
+    --accent: 263 80% 55%;
+    --accent-foreground: 219 14% 10%;
+
+    --destructive: 0 84% 60%;
+    --destructive-foreground: 210 40% 98%;
+
+    --border: 219 14% 25%;
+    --input: 219 14% 20%;
+    --ring: 263 80% 55%;
+
+    --sidebar-background: 219 14% 12%;
+    --sidebar-foreground: 0 0% 98%;
+    --sidebar-primary: 263 80% 55%;
+    --sidebar-primary-foreground: 219 14% 10%;
+    --sidebar-accent: 219 14% 25%;
+    --sidebar-accent-foreground: 0 0% 98%;
+    --sidebar-border: 219 14% 20%;
+    --sidebar-ring: 263 80% 55%;
+
+    --status-new: 0 0% 65%;
+    --status-in-progress: 217 91% 65%;
+    --status-repaired: 142 71% 50%;
+    --status-scrap: 0 84% 65%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply bg-background text-foreground;
+  }
+
+  :where(p, span, li, h1, h2, h3, h4, h5, h6, a, button, label, td, th) {
+    overflow-wrap: anywhere;
+    word-break: break-word;
+  }
+
+  pre,
+  code {
+    overflow-x: auto;
+    white-space: pre;
+  }
+}
